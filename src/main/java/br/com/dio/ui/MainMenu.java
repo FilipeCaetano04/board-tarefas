@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static br.com.dio.persistence.config.ConnectionConfig.getConnection;
-import static br.com.dio.persistence.entity.BoardColumnKindEnum.INITIAL;
-import static br.com.dio.persistence.entity.BoardColumnKindEnum.PENDING;
+import static br.com.dio.persistence.entity.BoardColumnKindEnum.*;
 
 public class MainMenu {
 
@@ -63,12 +62,12 @@ public class MainMenu {
 
         System.out.println("Informe o nome da coluna final do board:");
         var finalColumnName = scanner.next();
-        var finalColumn = createColumn(finalColumnName, PENDING,  additionalColumns + 1);
+        var finalColumn = createColumn(finalColumnName, FINAL,  additionalColumns + 1);
         columns.add(finalColumn);
 
         System.out.println("Informe o nome da coluna de cancelamento do board:");
         var cancelColumnName = scanner.next();
-        var cancelColumn = createColumn(cancelColumnName, PENDING,  additionalColumns + 2);
+        var cancelColumn = createColumn(cancelColumnName, CANCEL,  additionalColumns + 2);
         columns.add(cancelColumn);
 
         entity.setBoardColumns(columns);
