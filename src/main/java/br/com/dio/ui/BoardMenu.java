@@ -2,9 +2,11 @@ package br.com.dio.ui;
 
 import br.com.dio.persistence.entity.BoardColumnEntity;
 import br.com.dio.persistence.entity.BoardEntity;
+import br.com.dio.persistence.entity.CardEntity;
 import br.com.dio.service.BoardColumnQueryService;
 import br.com.dio.service.BoardQueryService;
 import br.com.dio.service.CardQueryService;
+import br.com.dio.service.CardService;
 import lombok.AllArgsConstructor;
 import org.w3c.dom.ls.LSOutput;
 
@@ -12,6 +14,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import static br.com.dio.persistence.config.ConnectionConfig.getConnection;
+import static br.com.dio.persistence.entity.BoardColumnKindEnum.INITIAL;
 
 @AllArgsConstructor
 public class BoardMenu {
@@ -58,10 +61,21 @@ public class BoardMenu {
         }
     }
 
-    private void createCard() {
+    private void createCard() throws SQLException {
+        var card = new CardEntity();
+        System.out.println("Informe o título do card");
+        card.setTitle(scanner.next());
+        System.out.println("Informe a descrição do card");
+        card.setDescription(scanner.next());
+        card.setBoardColumn(entity.getInitialColumn());
+
+        try (var connection = getConnection()){
+            new CardService(connection).insert(card);
+        }
     }
 
     private void moveCardToNextColumn() {
+
     }
 
     private void blockCard() {
@@ -79,7 +93,7 @@ public class BoardMenu {
             optioanl.ifPresent(b -> {
                 System.out.printf("Board [%s, %s]\n", b.id(), b.name());
                 b.columns().forEach(c -> {
-                    System.out.printf("Coluna %s tipo %s tem %s cards\n", c.name(), c.kind(), c.cards_amount());
+                    System.out.printf("Coluna [%s] tipo [%s] tem %s cards\n", c.name(), c.kind(), c.cards_amount());
                 });
             });
         }
@@ -87,14 +101,14 @@ public class BoardMenu {
 
     private void showColumn() throws SQLException {
         var columnsIds = entity.getBoardColumns().stream().map(BoardColumnEntity::getId).toList();
-        var selectedColumn = -1L;
-        while (!columnsIds.contains(selectedColumn)) {
+        var selectedColumnId = -1L;
+        while (!columnsIds.contains(selectedColumnId)) {
             System.out.printf("Escolha uma coluna do board %s\n", entity.getName());
             entity.getBoardColumns().forEach(c -> System.out.printf("%s - %s [%s]\n", c.getId(), c.getName(), c.getKind()));
-            selectedColumn = scanner.nextLong();
+            selectedColumnId = scanner.nextLong();
         }
         try (var connection = getConnection()){
-            var column = new BoardColumnQueryService(connection).findById(selectedColumn);
+            var column = new BoardColumnQueryService(connection).findById(selectedColumnId);
             column.ifPresent(co -> {
                 System.out.printf("Coluna %s tipo %s\n", co.getName(), co.getKind());
                 co.getCards().forEach(ca -> System.out.printf("Card %s - %s\nDescrição: %s\n",
