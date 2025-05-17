@@ -9,7 +9,6 @@ import br.com.dio.service.BoardService;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 
 import static br.com.dio.persistence.config.ConnectionConfig.getConnection;
